@@ -14,6 +14,7 @@ class App extends Component {
     loading: false,
     user: {},
     users: [],
+    repos: [],
     alert: null,
   };
 
@@ -43,12 +44,23 @@ class App extends Component {
     this.setState({ loading: false, user: res.data });
   };
 
+  //Get Repos
+  getUserRepos = async (username) => {
+    this.setState({ loading: true });
+
+    const res = await axios.get(
+      `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.GITHUB_CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}`
+    );
+
+    this.setState({ repos: res.data, loading: false });
+  };
+
   clearUsers = (e) => {
     this.setState({ users: [], loading: false });
   };
 
   render() {
-    const { users, user, loading, alert } = this.state;
+    const { users, user, loading, alert, repos } = this.state;
 
     return (
       <Router>
@@ -81,7 +93,9 @@ class App extends Component {
                     {...props}
                     getUser={this.getUser}
                     user={user}
+                    getUserRepos={this.getUserRepos}
                     loading={loading}
+                    repos={repos}
                   />
                 )}
               />
